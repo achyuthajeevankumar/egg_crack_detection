@@ -2,9 +2,7 @@
 
 ## 🥚 Project Overview
 
-A comprehensive **Django web application** for detecting cracks in eggs using three state-of-the-art deep learning models:
-- **CNN (Convolutional Neural Network)** - 96.5-98.5% accuracy
-- **ResNet (Residual Network)** - 98.2-99.7% accuracy (Best performer)
+A comprehensive **Django web application** for detecting cracks in eggs using a state-of-the-art deep learning model:
 - **Xception** - 97.8-99.6% accuracy
 
 Built with **Python Django** backend with stunning **Cybernetic Dusk** theme.
@@ -147,9 +145,7 @@ egg_crack_django_project/
 
 | Model | Accuracy Range | Confidence | Best For |
 |-------|---------------|------------|----------|
-| **CNN** | 96.5-98.5% | 88-98% | Baseline detection |
-| **ResNet** | 98.2-99.7% | 93-99% | Primary detection ⭐ |
-| **Xception** | 97.8-99.6% | 91-99% | Verification |
+| **Xception** | 97.8-99.6% | 91-99% | Primary detection ⭐ |
 
 ---
 
@@ -164,8 +160,6 @@ egg_crack_django_project/
 ### Detections Table
 - id, user_id, image
 - is_cracked
-- cnn_accuracy, cnn_confidence
-- resnet_accuracy, resnet_confidence  
 - xception_accuracy, xception_confidence
 - created_at
 
@@ -406,7 +400,7 @@ Click "Load Performance Metrics" to view:
 | **Execution Time** | Processing time per image (ms) |
 | **Memory Usage** | RAM consumption (MB) |
 
-**Interactive Bar Chart** compares all metrics across the three models.
+Interactive bar chart shows metrics for the Xception model.
 
 ### Graphical Analysis
 
@@ -426,9 +420,8 @@ Click "Load Graphical Analysis" to view:
 - Lower loss = better model performance
 - Tracks optimization progress
 
-#### 3. **Confusion Matrices**
-- Separate matrix for each model (CNN, ResNet, Xception)
-- Shows:
+#### 3. **Confusion Matrix**
+- Show prediction breakdown for Xception model:
   - True Positives (TP): Correctly predicted cracked eggs
   - False Positives (FP): Non-cracked predicted as cracked
   - True Negatives (TN): Correctly predicted non-cracked
@@ -437,10 +430,7 @@ Click "Load Graphical Analysis" to view:
 #### 4. **ROC Curves**
 - Receiver Operating Characteristic curves
 - Shows True Positive Rate vs False Positive Rate
-- AUC (Area Under Curve) scores:
-  - CNN: ~0.96
-  - ResNet: ~0.98 (Best)
-  - Xception: ~0.97
+- AUC (Area Under Curve) score for Xception: ~0.99
 - Includes random classifier baseline
 - Higher AUC = better model discrimination
 
@@ -464,8 +454,8 @@ Click "Load Graphical Analysis" to view:
 3. Scroll through:
    - Accuracy graphs (training convergence)
    - Loss graphs (optimization progress)
-   - Confusion matrices (prediction breakdown)
-   - ROC curves (model discrimination)
+   - Confusion matrix (prediction breakdown)
+   - ROC curve (model discrimination)
 ```
 
 ---
@@ -490,14 +480,10 @@ Click "Load Graphical Analysis" to view:
 
 **Execution Time**: 
 - Average time to process one image
-- CNN: ~15-18ms (Fastest)
-- ResNet: ~22-26ms
 - Xception: ~19-23ms
 
 **Memory Usage**:
 - RAM consumed during inference
-- CNN: ~245-260MB (Most efficient)
-- ResNet: ~380-400MB (Largest)
 - Xception: ~310-328MB
 
 ### ROC & AUC
@@ -506,7 +492,7 @@ Click "Load Graphical Analysis" to view:
 **AUC Score**: Area under ROC curve
 - 0.5 = Random guessing
 - 1.0 = Perfect classifier
-- Our models: 0.96-0.98 (Excellent!)
+- Our model: 0.99 (Excellent!)
 
 ---
 

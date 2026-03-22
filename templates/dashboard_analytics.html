@@ -1,0 +1,86 @@
+        <!-- Performance Comparison Section -->
+        <section id="performanceSection" class="content-section" style="display:none">
+            <h1 class="page-title">Performance Comparison</h1>
+            <p class="page-subtitle">Detailed metrics comparison across all three models</p>
+            
+            <div class="detection-container">
+                <button class="btn-primary" onclick="loadPerformanceComparison()" style="width:auto;padding:12px 30px;margin-bottom:30px">
+                    📊 Load Performance Metrics
+                </button>
+                
+                <div id="performanceTableContainer" style="display:none">
+                    <h3 style="color:var(--accent-teal);margin-bottom:20px">Model Performance Metrics</h3>
+                    <div class="users-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Accuracy (%)</th>
+                                    <th>Precision (%)</th>
+                                    <th>Recall (%)</th>
+                                    <th>F1-Score (%)</th>
+                                    <th>Execution Time (ms)</th>
+                                    <th>Memory Usage (MB)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performanceTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top:30px;text-align:center">
+                        <canvas id="performanceChart" style="max-height:400px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Graphical Analysis Section -->
+        <section id="graphicalSection" class="content-section" style="display:none">
+            <h1 class="page-title">Graphical Analysis</h1>
+            <p class="page-subtitle">Visual analysis of model training and performance</p>
+            
+            <div class="detection-container">
+                <button class="btn-primary" onclick="loadGraphicalAnalysis()" style="width:auto;padding:12px 30px;margin-bottom:30px">
+                    📈 Load Graphical Analysis
+                </button>
+                
+                <div id="graphicalContainer" style="display:none">
+                    <!-- Accuracy vs Epoch -->
+                    <div style="margin-bottom:40px">
+                        <h3 style="color:var(--accent-teal);margin-bottom:20px">Accuracy vs Epoch</h3>
+                        <canvas id="accuracyChart" style="max-height:400px"></canvas>
+                    </div>
+                    
+                    <!-- Loss vs Epoch -->
+                    <div style="margin-bottom:40px">
+                        <h3 style="color:var(--accent-teal);margin-bottom:20px">Loss vs Epoch</h3>
+                        <canvas id="lossChart" style="max-height:400px"></canvas>
+                    </div>
+                    
+                    <!-- Confusion Matrices -->
+                    <div style="margin-bottom:40px">
+                        <h3 style="color:var(--accent-teal);margin-bottom:20px">Confusion Matrices</h3>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+                            <div>
+                                <h4 style="text-align:center;color:var(--text-secondary);margin-bottom:15px">CNN Model</h4>
+                                <canvas id="confusionCNN"></canvas>
+                            </div>
+                            <div>
+                                <h4 style="text-align:center;color:var(--text-secondary);margin-bottom:15px">ResNet Model</h4>
+                                <canvas id="confusionResNet"></canvas>
+                            </div>
+                            <div>
+                                <h4 style="text-align:center;color:var(--text-secondary);margin-bottom:15px">Xception Model</h4>
+                                <canvas id="confusionXception"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ROC Curves -->
+                    <div style="margin-bottom:40px">
+                        <h3 style="color:var(--accent-teal);margin-bottom:20px">ROC Curves</h3>
+                        <canvas id="rocChart" style="max-height:400px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>

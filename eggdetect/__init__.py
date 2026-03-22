@@ -1,0 +1,1 @@
+# EggDetect AI - Django Project

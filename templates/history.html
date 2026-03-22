@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EggDetect AI - Detection History</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .history-result {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .history-result.cracked {
+            color: var(--accent-red);
+        }
+
+        .history-result.not-cracked {
+            color: var(--accent-green);
+        }
+
+        .history-date {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .model-metrics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .model-metric {
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            color: var(--accent-teal);
+            font-weight: 500;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .no-history-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <aside class="sidebar">
+        <div style="padding:0 25px 30px;border-bottom:1px solid var(--border-color);margin-bottom:20px">
+            <div class="sidebar-logo-icon">🥚</div>
+            <div class="sidebar-logo-text">EggDetect AI</div>
+        </div>
+
+        <nav style="flex:1;padding:0 15px">
+            <div class="menu-section">
+                <div class="menu-section-title">Main</div>
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                    <span class="menu-item-icon">🔍</span><span>Detection</span>
+                </a>
+                <a href="{% url 'history' %}" class="menu-item active">
+                    <span class="menu-item-icon">📊</span><span>History</span>
+                </a>
+                <a href="{% url 'performance_comparison' %}" class="menu-item">
+                    <span class="menu-item-icon">📈</span><span>Performance Comparison</span>
+                </a>
+                <a href="{% url 'graphical_analysis' %}" class="menu-item">
+                    <span class="menu-item-icon">📉</span><span>Graphical Analysis</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('profile')">
+                    <span class="menu-item-icon">👤</span><span>Profile</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-section">
+            <div style="display:flex;align-items:center;margin-bottom:15px">
+                <div class="user-avatar">{{ request.user.username.0|upper }}</div>
+                <div style="flex:1">
+                    <div style="font-weight:600;font-size:15px">{{ request.user.username }}</div>
+                    <div style="color:var(--text-secondary);font-size:12px">Member</div>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="btn-logout" style="text-align:center;text-decoration:none;display:block">Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section class="content-section">
+            <h1 class="page-title">Detection History</h1>
+            <p class="page-subtitle">View all your previous egg crack detections</p>
+
+            {% if detections %}
+                <div class="history-grid">
+                    {% for detection in detections %}
+                        <div class="history-card">
+                            <img src="{{ detection.image.url }}" alt="Egg detection" class="history-image">
+                            <div class="history-result {% if detection.is_cracked %}cracked{% else %}not-cracked{% endif %}">
+                                {% if detection.is_cracked %}⚠️ Cracked Egg{% else %}✅ Intact Egg{% endif %}
+                            </div>
+                            <div class="history-date">
+                                {{ detection.created_at|date:"M d, Y h:i A" }}
+                            </div>
+                            <div class="model-metrics">
+                                <div class="model-metric">
+                                    <div class="model-name">Detection Confidence</div>
+                                    <div class="metric-value">{{ detection.xception_confidence }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-history">
+                    <div class="no-history-icon">📊</div>
+                    <div>No detection history found.</div>
+                    <div style="margin-top: 10px; color: var(--text-secondary);">Upload your first egg image to get started!</div>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

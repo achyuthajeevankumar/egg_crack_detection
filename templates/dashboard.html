@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EggDetect AI - Dashboard</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#fbbf24">
+    <link rel="apple-touch-icon" href="{% static 'images/icon-192.png' %}">
+    <link rel="stylesheet" href="{% static 'css/styles_v3.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    {% csrf_token %}
+</head>
+<body class="dashboard-page">
+    <header class="mobile-header">
+
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="mobile-logo">EggDetect AI</div>
+        <button class="back-btn" onclick="goBack()" id="mobileBackBtn" style="visibility:hidden">←</button>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+
+        <div style="padding:0 25px 30px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:20px">
+            <div class="sidebar-logo-icon">🥚</div>
+            <div class="sidebar-logo-text">EggDetect AI</div>
+        </div>
+
+        <nav style="flex:1;padding:0 15px">
+            <div class="menu-section">
+                <div class="menu-section-title">Main</div>
+                <a href="#" class="menu-item active" onclick="showSection('detection')">
+                    <span class="menu-item-icon">🔍</span><span>Detection</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('history')">
+                    <span class="menu-item-icon">📊</span><span>History</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('training')">
+                    <span class="menu-item-icon">🧠</span><span>Model Training</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('performance')">
+                    <span class="menu-item-icon">📈</span><span>Performance</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('graphical')">
+                    <span class="menu-item-icon">📉</span><span>Analytics</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('profile')">
+                    <span class="menu-item-icon">👤</span><span>Profile</span>
+                </a>
+            </div>
+
+            {% if role == 'admin' %}
+            <div class="menu-section">
+                <div class="menu-section-title">Administration</div>
+                <a href="#" class="menu-item" onclick="showSection('admin-dashboard')">
+                    <span class="menu-item-icon">📈</span><span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('user-management')">
+                    <span class="menu-item-icon">👥</span><span>User Management</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('login-activity')">
+                    <span class="menu-item-icon">🔐</span><span>Login Activity</span>
+                </a>
+            </div>
+            {% endif %}
+        </nav>
+
+        <div class="user-section">
+            <div style="display:flex;align-items:center;margin-bottom:15px">
+                <div class="user-avatar">{{ username.0|upper }}</div>
+                <div style="flex:1">
+                    <div style="font-weight:600;font-size:15px">{{ username }}</div>
+                    <div style="color:var(--text-secondary);font-size:12px">{% if role == 'admin' %}Administrator{% else %}Member{% endif %}</div>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="btn-logout" style="text-align:center;text-decoration:none;display:block">Logout</a>
+        </div>
+    </aside>
+
+    <nav class="top-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">EggDetect AI</div>
+            <div class="nav-links">
+                <a href="#" onclick="showSection('detection')">Detection</a>
+                <a href="#" onclick="showSection('history')">History</a>
+                <a href="#" onclick="showSection('performance')">Performance</a>
+                <a href="#" onclick="showSection('graphical')">Analytics</a>
+            </div>
+            <div class="nav-user">
+                <span class="welcome-text">Welcome, {{ username }}</span>
+                <a href="{% url 'logout' %}" class="nav-logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section id="detectionSection" class="content-section">
+            <h1 class="page-title" style="text-align: center !important; width: 100% !important; display: block !important;">Egg Crack Detection</h1>
+            <p class="page-subtitle" style="text-align: center !important; width: 100% !important; display: block !important;">Upload or capture egg images for AI-powered crack detection</p>
+
+            <div class="detection-container">
+                <div class="detection-tabs">
+                    <button class="tab-btn active" onclick="switchTab('upload')">📤 Upload Image</button>
+                    <button class="tab-btn" onclick="switchTab('camera')">📷 Live Camera</button>
+                </div>
+
+                <div id="uploadTab" class="tab-content active">
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">🥚</div>
+                        <div>Click to upload egg image</div>
+                        <div style="color:var(--text-secondary);font-size:14px;margin-top:8px">Supports: JPG, PNG (Max 10MB)</div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
+                    <div id="uploadPreview" style="display:none;margin-top:20px">
+                        <img id="previewImage" class="image-preview">
+                        <div style="text-align:center;margin-top:20px">
+                            <button class="btn-primary" onclick="analyzeUploadedImage(event)">🔬 Analyze Image</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cameraTab" class="tab-content">
+                    <div style="text-align:center">
+                        <video id="cameraFeed" autoplay playsinline></video>
+                        <canvas id="captureCanvas" style="display:none"></canvas>
+                        <div class="camera-controls">
+                            <button class="btn-secondary" onclick="startCamera()">📷 Start Camera</button>
+                            <button class="btn-success" onclick="captureImage()" id="captureBtn" style="display:none">📸 Capture & Analyze</button>
+                            <button class="btn-secondary" onclick="stopCamera()" id="stopBtn" style="display:none">⏹️ Stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="results-container">
+                <div style="text-align:center;margin-bottom:30px">
+                    <h2 style="font-size:24px;margin-bottom:10px">Detection Results</h2>
+                    <div id="resultStatus" class="result-status"></div>
+                </div>
+
+                <div class="model-comparison">
+                    <div class="model-card" style="max-width:400px;margin:0 auto">
+                        <div class="model-name">Xception Model</div>
+                        <div class="model-accuracy" id="xceptionAccuracy">--</div>
+                        <div style="color:var(--text-secondary);margin-bottom:15px" id="xceptionPrediction">Prediction: --</div>
+                        <div class="confidence-bar"><div class="confidence-fill" id="xceptionConfidence" style="width:0%"></div></div>
+                        <div style="font-size:13px;color:var(--text-secondary)">Confidence: <span id="xceptionConfidenceText">0%</span></div>
+                    </div>
+                </div>
+
+                <div style="text-align:center;margin-top:30px">
+                    <button class="btn-report" onclick="generateReport()">📄 Generate Report</button>
+                    <div id="debugInfo" style="margin-top:20px;font-size:12px;color:var(--text-secondary);text-align:center;"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="historySection" class="content-section" style="display:none">
+            <h1 class="page-title" style="text-align: center !important; width: 100% !important; display: block !important;">Detection History</h1>
+            <p class="page-subtitle">View all your previous egg crack detections</p>
+            <div class="history-grid" id="historyGrid"></div>
+        </section>
+
+
+        <section id="profileSection" class="content-section" style="display:none">
+            <h1 class="page-title">User Profile</h1>
+            <p class="page-subtitle">Manage your account settings</p>
+            <div class="profile-card">
+                <div style="text-align:center;margin-bottom:30px">
+                    <div class="profile-avatar-large">{{ username }}</div>
+                    <h2>{{ username }}</h2>
+                </div>
+                <form onsubmit="updateProfile(event)">
+                    <div class="form-group"><label>Username</label><input type="text" id="profileUsername" required></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="profileEmail" required></div>
+                    <div class="form-group"><label>New Password (leave blank to keep current)</label><input type="password" id="profilePassword"></div>
+                    <div class="form-group"><label>Confirm New Password</label><input type="password" id="profileConfirmPassword"></div>
+                    <button type="submit" class="btn-primary">💾 Save Changes</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Model Training Section -->
+        <section id="trainingSection" class="content-section" style="display:none">
+            <h1 class="page-title">Model Training</h1>
+            <p class="page-subtitle">Train and fine-tune deep learning models for crack detection</p>
+            <div class="detection-container">
+                <div class="model-comparison">
+                    <div class="model-card" style="max-width:400px;margin:0 auto">
+                        <div class="model-name">Xception Model</div>
+                        <p style="color:var(--text-secondary);margin-bottom:20px">Extreme Inception architecture for maximum precision.</p>
+                        <div style="display:flex;gap:10px">
+                            <button class="btn-primary" onclick="trainModel('xception')" style="flex:1">🚀 Train</button>
+                            <button class="btn-primary" onclick="trainModel('xception_json')" style="flex:1;background:rgba(255,255,255,0.1)">📄 JSON</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="trainingStatus" style="margin-top:30px; display:none">
+                    <h3 style="color:var(--accent-teal)">Training in progress...</h3>
+                    <div class="confidence-bar"><div class="confidence-fill" id="trainingProgress" style="width:0%"></div></div>
+                    <p id="trainingLog" style="font-family:monospace; color:var(--success); margin-top:10px"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Comparison Section -->
+        <section id="performanceSection" class="content-section" style="display:none">
+            <h1 class="page-title">Performance Comparison</h1>
+            <p class="page-subtitle">Detailed metrics comparison across all three models</p>
+            <div class="detection-container">
+                <button class="btn-primary" onclick="loadPerformanceComparison()" style="width:auto;padding:12px 30px;margin-bottom:30px">📊 Load Performance Metrics</button>
+                <div id="performanceTableContainer" style="display:none">
+                    <h3 style="color:var(--accent-teal);margin-bottom:20px">Model Performance Metrics</h3>
+                    <div class="users-table"><table><thead><tr><th>Model</th><th>Accuracy (%)</th><th>Precision (%)</th><th>Recall (%)</th><th>F1-Score (%)</th><th>Execution Time (ms)</th><th>Memory Usage (MB)</th></tr></thead><tbody id="performanceTableBody"></tbody></table></div>
+                    <div style="margin-top:30px;text-align:center"><canvas id="performanceChart" style="max-height:400px"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Graphical Analysis Section -->
+        <section id="graphicalSection" class="content-section" style="display:none">
+            <h1 class="page-title">Graphical Analysis</h1>
+            <p class="page-subtitle">Visual analysis of model training and performance</p>
+            <div class="detection-container">
+                <button class="btn-primary" onclick="loadGraphicalAnalysis()" style="width:auto;padding:12px 30px;margin-bottom:30px">📈 Load Graphical Analysis</button>
+                <div id="graphicalContainer" style="display:none">
+                    <div style="margin-bottom:40px"><h3 style="color:var(--accent-teal);margin-bottom:20px">Accuracy vs Epoch</h3><canvas id="accuracyChart" style="max-height:400px"></canvas></div>
+                    <div style="margin-bottom:40px"><h3 style="color:var(--accent-teal);margin-bottom:20px">Loss vs Epoch</h3><canvas id="lossChart" style="max-height:400px"></canvas></div>
+                    <div style="margin-bottom:40px"><h3 style="color:var(--accent-teal);margin-bottom:20px">Confusion Matrix</h3><div style="display:grid;grid-template-columns:1fr;max-width:400px;margin:0 auto"><div><h4 style="text-align:center;color:var(--text-secondary);margin-bottom:15px">Xception Model</h4><canvas id="confusionXception"></canvas></div></div></div>
+                    <div style="margin-bottom:40px"><h3 style="color:var(--accent-teal);margin-bottom:20px">ROC Curves</h3><canvas id="rocChart" style="max-height:400px"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        {% if role == 'admin' %}
+        <section id="adminDashboardSection" class="content-section" style="display:none">
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p class="page-subtitle">System overview and statistics</p>
+            <div class="admin-stats">
+                <div class="stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
+                <div class="stat-card"><div class="stat-value" id="totalDetections">0</div><div class="stat-label">Total Detections</div></div>
+                <div class="stat-card"><div class="stat-value" id="crackedEggs">0</div><div class="stat-label">Cracked Eggs Found</div></div>
+                <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">Model Accuracy</div></div>
+            </div>
+        </section>
+
+        <section id="userManagementSection" class="content-section" style="display:none">
+            <h1 class="page-title">User Management</h1>
+            <p class="page-subtitle">Manage system users and permissions</p>
+            <div style="margin-bottom:20px">
+                <button class="btn-primary" onclick="showAddUserModal()" style="width:auto;padding:12px 30px">➕ Add New User</button>
+            </div>
+            <div class="users-table">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Created At</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="loginActivitySection" class="content-section" style="display:none">
+            <h1 class="page-title">Login Activity</h1>
+            <p class="page-subtitle">Monitor user login activities</p>
+            <div class="users-table">
+                <table>
+                    <thead>
+                        <tr><th>Username</th><th>Role</th><th>Timestamp</th><th>IP Address</th></tr>
+                    </thead>
+                    <tbody id="activityTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script src="{% static 'js/dashboard.js' %}?v=1.0.4"></script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function goBack() {
+            // If results are showing, hide them and show detection
+            const results = document.getElementById('resultsContainer');
+            if (results && results.classList.contains('visible')) {
+                results.classList.remove('visible');
+                document.getElementById('mobileBackBtn').style.visibility = 'hidden';
+                return;
+            }
+            
+            // Default: show detection section
+            showSection('detection');
+        }
+
+        // Intercept showSection to handle back button visibility and sidebar closing on mobile
+        const originalShowSection = window.showSection;
+        window.showSection = function(sectionId) {
+            if (typeof originalShowSection === 'function') {
+                originalShowSection(sectionId);
+            }
+            
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+
+            // Show back button if not in detection section
+            const backBtn = document.getElementById('mobileBackBtn');
+            if (backBtn) {
+                backBtn.style.visibility = sectionId === 'detection' ? 'hidden' : 'visible';
+            }
+        };
+
+        // Also handle the results container visibility for the back button
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    const results = document.getElementById('resultsContainer');
+                    const backBtn = document.getElementById('mobileBackBtn');
+                    if (results && results.classList.contains('visible')) {
+                        backBtn.style.visibility = 'visible';
+                    }
+                }
+            });
+        });
+        
+        const resultsContainer = document.getElementById('resultsContainer');
+        if (resultsContainer) {
+            observer.observe(resultsContainer, { attributes: true });
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/serviceworker.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

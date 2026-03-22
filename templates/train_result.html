@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ model }} Training Results - EggDetect AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --accent: #fbbf24;
+            --accent-teal: #00ffcc;
+            --glass: rgba(15, 23, 42, 0.7);
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .video-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: -1; opacity: 0.4;
+        }
+        .result-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .icon { font-size: 5rem; margin-bottom: 20px; }
+        .status-title { font-weight: 800; font-size: 2rem; margin-bottom: 10px; }
+        .details { color: rgba(255, 255, 255, 0.7); margin-bottom: 30px; }
+        .metric-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .metric { text-align: center; }
+        .metric-label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; }
+        .metric-value { font-size: 1.5rem; font-weight: 700; color: var(--accent-teal); }
+        .btn-premium {
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 12px 30px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .btn-premium:hover { transform: scale(1.05); background: #fff; }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop playsinline class="video-bg">
+        <source src="{% static 'images/Video_Ready.mp4' %}" type="video/mp4">
+    </video>
+
+    <div class="result-card">
+        <div class="icon">{% if result.success %}🚀{% else %}⚠️{% endif %}</div>
+        <h1 class="status-title">{{ model }} Training</h1>
+        <p class="details">{{ result.message }}</p>
+
+        {% if result.success %}
+        <div class="metric-box">
+            <div class="metric">
+                <div class="metric-label">Accuracy</div>
+                <div class="metric-value">{{ result.val_accuracy }}%</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Loss</div>
+                <div class="metric-value">{{ result.val_loss }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'dashboard' %}" class="btn-premium">Back to Dashboard</a>
+    </div>
+</body>
+</html>
