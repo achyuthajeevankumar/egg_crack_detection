@@ -7,6 +7,3 @@ numpy==1.26.4
 h5py==3.10.0
 gunicorn==21.2.0
 whitenoise==6.6.0
-tf2onnx==1.16.1
-onnx==1.17.0
-tensorflow==2.15.0

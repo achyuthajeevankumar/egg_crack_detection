@@ -2,16 +2,30 @@ import os
 import json
 import shutil
 from django.conf import settings
-import tensorflow as tf
-from tensorflow.keras import layers, models, optimizers, callbacks, preprocessing, applications
-import tf2onnx
-import onnx
+
+# ------------------- Optional Training Dependencies -------------------
+try:
+    import tensorflow as tf
+    from tensorflow.keras import layers, models, optimizers, callbacks, preprocessing, applications
+    import tf2onnx
+    import onnx
+    HAS_TRAINING_DEPS = True
+except ImportError:
+    HAS_TRAINING_DEPS = False
 
 # ----------------------------------------------------------------xception model training----------------------------------------------------
 
 
 
 def xception_model():
+    if not HAS_TRAINING_DEPS:
+        return {
+            'success': False,
+            'message': "Training is disabled in this environment (TensorFlow/tf2onnx/onnx are missing). Please run locally if you wish to retrain.",
+            'val_accuracy': None,
+            'val_loss': None
+        }
+
     try:
         # Paths
         dataset_dir = os.path.join(settings.MEDIA_ROOT, 'augmented_dataset')
