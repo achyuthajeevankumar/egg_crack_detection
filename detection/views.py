@@ -105,10 +105,27 @@ def is_egg_image(image_path):
         }
         
         # Primary Whitelist (Birds/Hens)
-        EGG_INDICES = set(range(7, 101)) # Broad bird category
+        EGG_INDICES = set(range(7, 101)) # Broad bird category (Hens, Geese, etc.)
         
-        # Secondary Whitelist (Common misclassifications for eggs)
-        MISCLASS_WHITELIST = {722, 574, 892, 417, 970, 535, 715, 721, 783, 744, 647, 844}
+        # Secondary Whitelist (Objects often confused with eggs or cracked eggs in ImageNet)
+        MISCLASS_WHITELIST = {
+            722, 574, 892, 417, 970, 535, 715, 783, 721, 744, 647, 844,
+            518, 522, 400, 406, 404, 911, 407, 439, 441, 442, 451, 459, 
+            461, 466, 471, 483, 498, 506, 513, 515, 528, 532, 539, 549, 
+            552, 554, 555, 557, 560, 565, 568, 579, 584, 587, 588, 589, 
+            591, 592, 593, 594, 595, 597, 608, 610, 611, 617, 618, 619, 
+            627, 629, 630, 635, 637, 640, 641, 650, 652, 653, 659, 661, 
+            664, 667, 669, 672, 673, 674, 680, 681, 683, 685, 688, 693, 
+            694, 700, 701, 705, 712, 713, 716, 723, 725, 727, 728, 730, 
+            731, 734, 736, 738, 742, 743, 746, 755, 756, 757, 758, 760, 
+            761, 762, 765, 766, 770, 772, 773, 775, 779, 782, 788, 792, 
+            793, 794, 796, 797, 799, 804, 808, 809, 811, 812, 813, 815, 
+            816, 819, 821, 822, 823, 825, 826, 827, 831, 835, 836, 839, 
+            841, 842, 843, 845, 846, 847, 853, 856, 857, 866, 869, 874, 
+            879, 882, 884, 891, 895, 899, 903, 905, 908, 912, 914, 916, 
+            919, 921, 924, 929, 933, 936, 941, 944, 946, 951, 955, 957, 
+            961, 963, 965, 967, 969, 971, 974, 978, 981, 984, 987, 989, 991
+        }
         
         label = LABEL_MAP.get(top_idx, f"Object #{top_idx}")
         
@@ -139,7 +156,7 @@ def predict_egg_crack(image_path):
     # 1. 🔍 Validate if it's an egg
     is_egg, debug_msg = is_egg_image(image_path)
     if not is_egg:
-        raise ValueError(f"Not an egg image. AI saw: {debug_msg}")
+        raise ValueError(f"Not an egg image (Detected: {debug_msg})")
 
     results = {}
     
@@ -168,6 +185,7 @@ def predict_egg_crack(image_path):
         return bool(class_idx == 0), confidence
 
     is_cracked_xcp, conf_xcp = get_metrics(pred_xcp) if pred_xcp is not None else (False, 0.0)
+    print(f"   [RESULT] Cracked: {is_cracked_xcp}, Confidence: {conf_xcp}%")
     
     # Use training result accuracies for the response
     results_path = os.path.join(settings.BASE_DIR, 'ml_models')

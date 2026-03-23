@@ -177,6 +177,40 @@
             margin-bottom: 25px;
             border: 1px solid rgba(251, 191, 36, 0.3);
         }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .glass-nav {
+                padding: 1rem;
+            }
+            .brand {
+                font-size: 1.2rem;
+            }
+            .hero-card {
+                padding: 40px 20px;
+                border-radius: 20px;
+            }
+            .hero-card h1 {
+                font-size: 2.5rem;
+            }
+            .hero-card p {
+                font-size: 1.1rem;
+            }
+            .cta-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn-premium, .btn-outline-glass {
+                width: 100%;
+                text-align: center;
+            }
+            .nav-auth-links {
+                display: none !important; /* Hide secondary links on very small screens if needed, or collapse */
+            }
+            .glass-nav {
+                justify-content: center !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -189,7 +223,7 @@
             <a href="/" class="brand">
                 <i class="bi bi-egg-fill"></i> EggDetect AI
             </a>
-            <div class="d-flex gap-4 align-items-center">
+            <div class="d-flex gap-4 align-items-center nav-auth-links">
                 <a href="{% url 'userlogin' %}" class="text-white text-decoration-none fw-bold opacity-75"><i class="bi bi-box-arrow-in-right"></i> Sign In</a>
                 <a href="{% url 'registration' %}" class="btn btn-premium"><i class="bi bi-person-plus-fill"></i> Get Started</a>
             </div>

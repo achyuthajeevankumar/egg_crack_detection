@@ -141,8 +141,13 @@ function analyzeUploadedImage(event) {
     })
     .then(data => {
         console.log('Upload data received:', data);
-        if (data.success) displayResults(data.results);
-        else showNotification(data.message, 'error');
+        if (data.success) {
+            displayResults(data.results);
+            showNotification('Analysis complete!', 'success');
+        } else {
+            console.warn('Analysis rejected:', data.message);
+            showNotification(data.message, 'error');
+        }
     })
     .catch(err => {
         console.error('Upload analysis error:', err);
@@ -255,10 +260,11 @@ function displayResults(results) {
     // Add version info if available
     const infoEl = document.getElementById('debugInfo');
     if (infoEl && results.version) {
-        infoEl.textContent = 'App Version: ' + results.version;
+        infoEl.textContent = 'App Version: ' + results.version + ' | ' + (isCracked ? 'CRACK_FOUND' : 'INTACT');
     }
     
     container.scrollIntoView({ behavior: 'smooth' });
+    console.log('Results rendered to DOM successfully');
 }
 
 function loadHistory() {
